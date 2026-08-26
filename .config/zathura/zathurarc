@@ -1,0 +1,10 @@
+# Remap Vim-style movement from hjkl to jkl;
+unmap h
+unmap j
+unmap k
+unmap l
+
+map j scroll left
+map k scroll down
+map l scroll up
+map ; scroll right
