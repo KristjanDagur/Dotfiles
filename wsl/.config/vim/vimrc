@@ -1,38 +1,79 @@
+" ====================
+" Movement
+" ====================
+" Use j/k/l/; for left/down/up/right.
 noremap j h
 noremap k j
 noremap l k
 noremap ; l
 
+" ====================
+" Cursor shape
+" ====================
+" 2 = solid block
+" 4 = solid underline
+" 5 = blinking vertical bar
+let &t_SI = "\<Esc>[5 q"  " Insert mode
+let &t_SR = "\<Esc>[4 q"  " Replace mode
+let &t_EI = "\<Esc>[2 q"  " Normal mode
 
-" Cursor shape:
-" 2 = block
-" 4 = underline
-" 6 = vertical bar
+" ====================
+" Line numbers
+" ====================
+set number
+set relativenumber
 
-" different cursor shapes in insert mode
-let &t_SI = "\<Esc>[5 q" "SI = insert mode, blinking vertical bar
-let &t_SR = "\<Esc>[4 q" "SR = replace mode, solid underscore
-let &t_EI = "\<Esc>[2 q" "EI = normal mode, solid block
-
-augroup CursorShape
-  autocmd!
-  autocmd VimEnter,InsertLeave,VimResume * silent! !printf '\033[2 q'
-  autocmd InsertEnter * silent! !printf '\033[6 q'
-  autocmd VimLeave * silent! !printf '\033[2 q'
-augroup END
-
-set nu rnu 
-
-highlight LineNr ctermfg=99 guifg=#6F68DD
+highlight LineNr       ctermfg=99 guifg=#6F68DD
 highlight CursorLineNr ctermfg=99 guifg=#6F68DD
 
+" ====================
+" Indentation
+" ====================
 set autoindent
 set expandtab
 set tabstop=4
 set shiftwidth=4
 
+" ====================
+" Search
+" ====================
 set ignorecase
+
+" ====================
+" Mouse
+" ====================
 set mouse=a
 
-set undofile
-set undodir=~/.vim/undo//
+" ====================
+" Integration with global clipboard
+" ====================
+
+" WSL / Wayland clipboard
+function! WslClipboardAvailable() abort
+    return executable('wl-copy') && executable('wl-paste')
+endfunction
+
+function! WslClipboardCopy(reg, type, lines) abort
+    call system('wl-copy', a:lines)
+endfunction
+
+function! WslClipboardPaste(reg) abort
+    let l:lines = systemlist('wl-paste --no-newline')
+    call map(l:lines, 'trim(v:val, "\r", 2)')
+    return ['', l:lines]
+endfunction
+
+let v:clipproviders['wslclip'] = {
+      \ 'available': function('WslClipboardAvailable'),
+      \ 'copy': {
+      \   '+': function('WslClipboardCopy'),
+      \   '*': function('WslClipboardCopy'),
+      \ },
+      \ 'paste': {
+      \   '+': function('WslClipboardPaste'),
+      \   '*': function('WslClipboardPaste'),
+      \ },
+      \ }
+
+set clipmethod^=wslclip
+set clipboard=unnamedplus
