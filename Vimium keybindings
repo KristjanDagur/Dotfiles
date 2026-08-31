@@ -1,0 +1,7 @@
+# Insert your preferred key mappings here.
+map k scrollDown
+map l scrollUp
+map j scrollLeft
+map ; scrollRight
+map J goBack
+map : goForward
